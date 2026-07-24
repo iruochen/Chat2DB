@@ -190,9 +190,9 @@ public class DbExcelTableServiceImpl implements IDbExcelTableService {
     private void buildCreateTable(List<ExcelCheckResponse.Sheet> sheetList) {
         for (ExcelCheckResponse.Sheet sheet : sheetList) {
             StringBuilder sb = new StringBuilder();
-            sb.append("CREATE TABLE ").append("\"").append(sheet.getTableName()).append("\"").append(" (").append("\n");
+            sb.append("CREATE TABLE ").append(quoteIdentifier(sheet.getTableName())).append(" (").append("\n");
             for (ExcelCheckResponse.Header header : sheet.getHeaderList()) {
-                sb.append("\"").append(header.getHeaderName()).append("\"").append(" ");
+                sb.append(quoteIdentifier(header.getHeaderName())).append(" ");
                 if (StringUtils.isNotBlank(header.getDataType())) {
                     sb.append(header.getDataType());
                 } else {
@@ -200,7 +200,7 @@ public class DbExcelTableServiceImpl implements IDbExcelTableService {
                 }
                 sb.append(" NULL ");
                 if (StringUtils.isNotBlank(header.getComment())) {
-                    sb.append(" COMMENT '").append(header.getComment()).append("',");
+                    sb.append(" COMMENT '").append(header.getComment().replace("'", "''")).append("',");
                 } else {
                     sb.append(",");
                 }
@@ -210,6 +210,11 @@ public class DbExcelTableServiceImpl implements IDbExcelTableService {
             sb.append("\n );");
             sheet.setDdl(sb.toString());
         }
+    }
+
+    // H2 double-quoted identifier; escape embedded double quotes by doubling.
+    private static String quoteIdentifier(String name) {
+        return "\"" + name.replace("\"", "\"\"") + "\"";
     }
 
 }
