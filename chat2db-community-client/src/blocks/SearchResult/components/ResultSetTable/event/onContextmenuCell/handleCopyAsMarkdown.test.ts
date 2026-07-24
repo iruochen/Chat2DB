@@ -44,6 +44,19 @@ assertEqual(
 );
 
 assertEqual(
+  formatSelectionAsMarkdown(
+    [[{ row: 1, col: 1, field: 'html', value: '<script>alert("x")</script> & next\nline' }]],
+    () => '<Header & value>',
+  ),
+  [
+    '| &lt;Header &amp; value&gt; |',
+    '| --- |',
+    '| &lt;script&gt;alert("x")&lt;/script&gt; &amp; next<br>line |',
+  ].join('\n'),
+  'escapes source HTML before inserting generated line-break markup',
+);
+
+assertEqual(
   formatSelectionAsMarkdown([[{ row: 0, col: 1, field: 'id', value: 'id' }]]),
   null,
   'ignores header-only selections',
